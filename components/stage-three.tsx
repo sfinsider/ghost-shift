@@ -80,9 +80,9 @@ export function StageThree() {
   }, [showMinigame, observerMode])
 
   useEffect(() => {
-    // Don't spawn items if not in minigame mode or in observer mode
-    if (!showMinigame || observerMode) {
-      console.log("[v0] Spawner disabled - showMinigame:", showMinigame, "observerMode:", observerMode)
+   // Don't spawn items if not in minigame mode, in observer mode, or already failed
+    if (!showMinigame || observerMode || mistakes >= 3) {
+      console.log("[v0] Spawner disabled - showMinigame:", showMinigame, "observerMode:", observerMode, "mistakes:", mistakes)
       return
     }
 
@@ -111,13 +111,14 @@ export function StageThree() {
       console.log("[v0] Cleaning up spawner")
       clearInterval(spawnInterval)
     }
-  }, [showMinigame, observerMode]) // Re-run when these change
+  }, [showMinigame, observerMode, mistakes]) // Re-run when these change
 
   useEffect(() => {
     if (mistakes >= 3 && showMinigame && !systemOverride) {
       console.log("[v0] Reflex Game: FAILED - forcing automation with 3 workers")
       trackDecision(3, "QC Failed - System Override", "-20 Humanity, Workers → 3 (forced)")
       setSystemOverride(true)
+      setItems([]) // Clear in-flight items so none can register further mistakes
       updateHumanityScore(-20)
       setWorkers(3) // Penalty: forced to skeleton crew
 
@@ -143,6 +144,7 @@ export function StageThree() {
   ])
 
   const handleItemComplete = (item: DefectItem) => {
+    if (systemOverride) return // Round already failed, ignore stray completions
     console.log("[v0] Item completed:", item.id, "isDefect:", item.isDefect)
     if (item.isDefect) {
       setMistakes((m) => m + 1)
@@ -154,6 +156,7 @@ export function StageThree() {
   }
 
   const handleItemClick = (item: DefectItem) => {
+    if (systemOverride) return // Round already failed, ignore stray clicks
     console.log("[v0] Item clicked:", item.id, "isDefect:", item.isDefect)
     if (item.isDefect) {
       updateQuota(1)
@@ -223,7 +226,7 @@ export function StageThree() {
             </p>
             <div className="flex gap-4 md:gap-12 justify-center text-xl md:text-3xl">
               <div className="text-red-400 font-mono">
-                MISTAKES: <span className="font-bold">{mistakes}/3</span>
+                MISTAKES: <span className="font-bold">{Math.min(mistakes, 3)}/3</span>
               </div>
               <div className="text-green-400 font-mono">
                 QUOTA: <span className="font-bold">{Math.floor(gameState.quota)} / 200</span>
@@ -267,11 +270,37 @@ export function StageThree() {
             Green items ship automatically. Red items are defects - click to catch them!
           </div>
         </div>
+
+        <AnimatePresence>
+          {systemOverride && (
+            <motion.div
+              className="absolute inset-0 bg-red-950/95 flex items-center justify-center z-[100] px-4"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+            >
+              <div className="text-center space-y-4 md:space-y-8">
+                <motion.div
+                  className="text-3xl md:text-6xl font-bold text-red-400 font-mono"
+                  animate={{ scale: [1, 1.05, 1] }}
+                  transition={{ duration: 0.5, repeat: Number.POSITIVE_INFINITY }}
+                >
+                  SYSTEM OVERRIDE
+                </motion.div>
+                <div className="text-lg md:text-3xl text-white">EXCESSIVE ERRORS DETECTED</div>
+                <div className="text-base md:text-2xl text-red-300">AI SUPERVISOR DEPLOYED</div>
+                <div className="text-sm md:text-lg text-white/70">Human quality control: TERMINATED</div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     )
   }
 
   if (observerMode) {
+
+ 
     return (
       <div className="relative w-full h-screen overflow-hidden bg-black">
         <div className="absolute inset-0">
