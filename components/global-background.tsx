@@ -1,6 +1,7 @@
 "use client"
 
 import { useGame } from "@/contexts/game-context"
+import { motion, AnimatePresence } from "framer-motion"
 
 export function GlobalBackground() {
   const { gameState } = useGame()
@@ -29,17 +30,23 @@ export function GlobalBackground() {
   if (!backgroundImage) return null
 
   return (
-    <div
-      key={gameState.currentStage}
-      className="fixed inset-0 w-screen h-screen z-[-1]"
-      style={{
-        backgroundImage: `url(${backgroundImage})`,
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-        backgroundRepeat: "no-repeat",
-      }}
-    >
-      <div className="absolute inset-0 bg-black/40" />
-    </div>
+    <AnimatePresence mode="wait">
+      <motion.div
+        key={gameState.currentStage}
+        className="fixed inset-0 w-screen h-screen z-[-1]"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.5 }}
+        style={{
+          backgroundImage: `url(${backgroundImage})`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
+        }}
+      >
+        <div className="absolute inset-0 bg-black/40" />
+      </motion.div>
+    </AnimatePresence>
   )
 }

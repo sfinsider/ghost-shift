@@ -2,6 +2,7 @@
 
 import { useGame } from "@/contexts/game-context"
 import { Users, Target, Clock, RotateCcw } from "lucide-react"
+import { motion } from "framer-motion"
 
 export function HUD({ onRestart }: { onRestart?: () => void }) {
   const { gameState, resetGame } = useGame()
@@ -22,7 +23,11 @@ export function HUD({ onRestart }: { onRestart?: () => void }) {
   }
 
   return (
-    <div className="fixed top-0 left-0 right-0 z-50 bg-black/70 backdrop-blur-md border-b border-white/10">
+    <motion.div
+      initial={{ y: -100, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      className="fixed top-0 left-0 right-0 z-50 bg-black/70 backdrop-blur-md border-b border-white/10"
+    >
       <div className="container mx-auto px-4 py-3">
         <div className="flex items-center justify-between gap-4">
           {/* Primary: Quota Progress */}
@@ -36,9 +41,11 @@ export function HUD({ onRestart }: { onRestart?: () => void }) {
                 <span className="text-xs text-gray-400">units</span>
               </div>
               <div className="w-full bg-gray-800 h-1.5 rounded-full overflow-hidden">
-                <div
-                  className="h-full bg-orange-400 transition-all duration-300"
-                  style={{ width: `${quotaProgress}%` }}
+                <motion.div
+                  className="h-full bg-orange-400"
+                  initial={{ width: 0 }}
+                  animate={{ width: `${quotaProgress}%` }}
+                  transition={{ duration: 0.3 }}
                 />
               </div>
             </div>
@@ -66,6 +73,6 @@ export function HUD({ onRestart }: { onRestart?: () => void }) {
           </button>
         </div>
       </div>
-    </div>
+    </motion.div>
   )
 }

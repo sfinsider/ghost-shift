@@ -1,6 +1,7 @@
 "use client"
 
 import { useGame } from "@/contexts/game-context"
+import { motion } from "framer-motion"
 import { Button } from "./ui/button"
 import Image from "next/image"
 
@@ -151,7 +152,11 @@ export function DecisionModal({ stage, onChoice, onDecisionMade, title, descript
   const decision = decisions[stage]
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center px-4 py-8">
+    <motion.div
+      className="fixed inset-0 z-50 flex items-center justify-center px-4 py-8"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+    >
       <div className="absolute inset-0 -z-10">
         <Image
           src={decision.backgroundImage || "/placeholder.svg"}
@@ -163,19 +168,28 @@ export function DecisionModal({ stage, onChoice, onDecisionMade, title, descript
         <div className="absolute inset-0 bg-black/70" />
       </div>
 
-      <div className="max-w-2xl w-full max-h-[90vh] overflow-y-auto bg-gradient-to-b from-gray-900/90 to-black/90 backdrop-blur-md border border-orange-500/30 rounded-lg p-8 space-y-6 relative z-[100] my-8">
+      <motion.div
+        className="max-w-2xl w-full max-h-[90vh] overflow-y-auto bg-gradient-to-b from-gray-900/90 to-black/90 backdrop-blur-md border border-orange-500/30 rounded-lg p-8 space-y-6 relative z-[100] my-8"
+        initial={{ scale: 0.9, y: 20 }}
+        animate={{ scale: 1, y: 0 }}
+        transition={{ delay: 0.2 }}
+      >
         {/* Title */}
         <div className="text-center space-y-2">
-          <div className="text-orange-400 text-sm font-mono tracking-widest animate-pulse">
+          <motion.div
+            className="text-orange-400 text-sm font-mono tracking-widest"
+            animate={{ opacity: [1, 0.5, 1] }}
+            transition={{ duration: 2, repeat: Number.POSITIVE_INFINITY }}
+          >
             {decision.title}
-          </div>
+          </motion.div>
           <h2 className="text-3xl font-bold text-white">{decision.subtitle}</h2>
         </div>
 
         {/* Choices */}
         <div className="grid md:grid-cols-2 gap-4 items-stretch mt-8">
           {/* Choice A */}
-          <div className="hover:scale-102 active:scale-98 transition-transform">
+          <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
             <Button
               onClick={() => {
                 console.log("[v0] Choice A button clicked")
@@ -200,10 +214,10 @@ export function DecisionModal({ stage, onChoice, onDecisionMade, title, descript
                 </div>
               )}
             </Button>
-          </div>
+          </motion.div>
 
           {/* Choice B */}
-          <div className="hover:scale-102 active:scale-98 transition-transform">
+          <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
             <Button
               onClick={() => {
                 console.log("[v0] Choice B button clicked")
@@ -228,11 +242,11 @@ export function DecisionModal({ stage, onChoice, onDecisionMade, title, descript
                 </div>
               )}
             </Button>
-          </div>
+          </motion.div>
         </div>
 
         <div className="text-center text-xs text-white/40 mt-6">Choose wisely. There's no going back.</div>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   )
 }

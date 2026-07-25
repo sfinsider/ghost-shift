@@ -1,6 +1,7 @@
 "use client"
 
 import { useGame } from "@/contexts/game-context"
+import { motion, AnimatePresence } from "framer-motion"
 import Image from "next/image"
 import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
@@ -192,14 +193,27 @@ export function StageFiveEndings() {
 
   if (showTermination && gameState.ending === "automated") {
     return (
-      <div className="fixed inset-0 z-[100] bg-black flex items-center justify-center">
-        {terminationIndex < FIRED_WORKERS.length && (
-          <div key={terminationIndex} className="text-center">
-            <div className="text-3xl text-white/90 font-mono">{FIRED_WORKERS[terminationIndex]}</div>
-            <div className="text-lg text-red-400 mt-4 tracking-widest">TERMINATED</div>
-          </div>
-        )}
-      </div>
+      <motion.div
+        className="fixed inset-0 z-[100] bg-black flex items-center justify-center"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+      >
+        <AnimatePresence mode="wait">
+          {terminationIndex < FIRED_WORKERS.length && (
+            <motion.div
+              key={terminationIndex}
+              className="text-center"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.15 }}
+            >
+              <div className="text-3xl text-white/90 font-mono">{FIRED_WORKERS[terminationIndex]}</div>
+              <div className="text-lg text-red-400 mt-4 tracking-widest">TERMINATED</div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </motion.div>
     )
   }
 
@@ -211,44 +225,68 @@ export function StageFiveEndings() {
   if (!gameFinished) return null
 
   return (
-    <div className="fixed inset-0 z-[100] overflow-hidden">
-      {/* Background */}
-      {ending.background ? (
-        <div className="absolute inset-0">
-          <Image src={ending.background || "/placeholder.svg"} alt="Ending" fill className="object-cover" priority />
+    <AnimatePresence mode="wait">
+      <motion.div
+        className="fixed inset-0 z-[100] overflow-hidden"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 2 }}
+      >
+        {/* Background */}
+        {ending.background ? (
+          <div className="absolute inset-0">
+            <Image src={ending.background || "/placeholder.svg"} alt="Ending" fill className="object-cover" priority />
+            <div className={`absolute inset-0 ${ending.bgClass}`} />
+          </div>
+        ) : (
           <div className={`absolute inset-0 ${ending.bgClass}`} />
-        </div>
-      ) : (
-        <div className={`absolute inset-0 ${ending.bgClass}`} />
-      )}
+        )}
 
-      <div className="relative h-screen flex flex-col items-center justify-center p-4">
-        <div className="text-center font-mono space-y-4">
-          {ending.lines.map((line, index) => (
-            <div
-              key={index}
-              className={`text-3xl md:text-4xl ${ending.textColor} font-bold`}
-            >
-              {line}
-            </div>
-          ))}
-
-          <span className={`inline-block w-3 h-8 ml-2 ${ending.textColor} bg-current animate-pulse`} />
-        </div>
-
-        <div className="mt-8">
-          <Button
-            onClick={() => {
-              console.log("[v0] Restarting game")
-              resetGame()
-            }}
-            variant="outline"
-            className="text-base md:text-lg py-4 px-6 border-white/30 text-white hover:bg-white/10 bg-transparent font-mono"
+        <div className="relative h-screen flex flex-col items-center justify-center p-4">
+          <motion.div
+            className="text-center font-mono space-y-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.5 }}
           >
-            START NEW SHIFT
-          </Button>
+            {ending.lines.map((line, index) => (
+              <motion.div
+                key={index}
+                className={`text-3xl md:text-4xl ${ending.textColor} font-bold`}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5 + index * 0.5 }}
+              >
+                {line}
+              </motion.div>
+            ))}
+
+            <motion.span
+              className={`inline-block w-3 h-8 ml-2 ${ending.textColor} bg-current`}
+              animate={{ opacity: [1, 0] }}
+              transition={{ duration: 0.8, repeat: Number.POSITIVE_INFINITY }}
+            />
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 3 }}
+            className="mt-8"
+          >
+            <Button
+              onClick={() => {
+                console.log("[v0] Restarting game")
+                resetGame()
+              }}
+              variant="outline"
+              className="text-base md:text-lg py-4 px-6 border-white/30 text-white hover:bg-white/10 bg-transparent font-mono"
+            >
+              START NEW SHIFT
+            </Button>
+          </motion.div>
         </div>
-      </div>
-    </div>
+      </motion.div>
+    </AnimatePresence>
   )
 }

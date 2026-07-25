@@ -1,5 +1,6 @@
 "use client"
 
+import { motion } from "framer-motion"
 import { useGame } from "@/contexts/game-context"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
@@ -26,9 +27,19 @@ export function StageIntro() {
 
       {/* Content */}
       <div className="relative z-10 h-full flex items-center justify-center px-4">
-        <div className="max-w-lg w-full">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          className="max-w-lg w-full"
+        >
           <Card className="bg-black/60 backdrop-blur-lg border-white/20 p-8 shadow-2xl">
-            <div className="space-y-6">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.3, duration: 1 }}
+              className="space-y-6"
+            >
               {/* Title */}
               <div className="text-center space-y-2">
                 <h1 className="text-4xl font-bold text-white tracking-tight">GHOST SHIFT</h1>
@@ -50,14 +61,14 @@ export function StageIntro() {
               </div>
 
               {/* Start Button */}
-              <div>
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.8 }}>
                 <Button
                   onClick={startGame}
                   className="w-full bg-orange-600 hover:bg-orange-700 text-white font-mono uppercase tracking-wider text-lg py-6 shadow-lg shadow-orange-900/50 transition-all hover:shadow-xl hover:shadow-orange-900/70"
                 >
                   BEGIN SHIFT
                 </Button>
-              </div>
+              </motion.div>
 
               {/* Ambient Details */}
               <div className="flex items-center justify-center gap-4 text-xs text-gray-500 font-mono">
@@ -67,9 +78,9 @@ export function StageIntro() {
                 <span>•</span>
                 <span>STATUS: ACTIVE</span>
               </div>
-            </div>
+            </motion.div>
           </Card>
-        </div>
+        </motion.div>
       </div>
     </div>
   )

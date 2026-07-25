@@ -4,6 +4,7 @@ import type React from "react"
 
 import { useEffect, useState, useRef } from "react"
 import { useGame } from "@/contexts/game-context"
+import { motion, AnimatePresence } from "framer-motion"
 import { DecisionModal } from "./decision-modal"
 
 interface FloatingText {
@@ -96,57 +97,75 @@ export function StageOne() {
     <div className="relative w-full h-screen overflow-hidden">
       {/* Interaction Area */}
       <div className="relative h-full flex flex-col items-center justify-center px-4">
-        <div
-          className="relative w-full max-w-2xl aspect-square cursor-pointer select-none hover:scale-102 active:scale-98 transition-transform"
+        <motion.div
+          className="relative w-full max-w-2xl aspect-square cursor-pointer select-none"
           onMouseDown={handleHoldStart}
           onMouseUp={handleHoldEnd}
           onMouseLeave={handleHoldEnd}
           onTouchStart={handleHoldStart}
           onTouchEnd={handleHoldEnd}
           onClick={handleTap}
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
         >
           {/* Floating +1 texts */}
-          {floatingTexts?.map((text) => (
-            <div
-              key={text.id}
-              className="absolute text-4xl font-bold text-orange-400 pointer-events-none animate-pulse"
-              style={{ left: text.x, top: text.y, opacity: 0.8 }}
-            >
-              {text.text}
-            </div>
-          ))}
+          <AnimatePresence>
+            {floatingTexts?.map((text) => (
+              <motion.div
+                key={text.id}
+                className="absolute text-4xl font-bold text-orange-400 pointer-events-none"
+                style={{ left: text.x, top: text.y }}
+                initial={{ opacity: 1, y: 0, scale: 1 }}
+                animate={{ opacity: 0, y: -100, scale: 1.5 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 1 }}
+              >
+                {text.text}
+              </motion.div>
+            ))}
+          </AnimatePresence>
 
           {/* Central prompt */}
           <div className="absolute inset-0 flex items-center justify-center">
             <div className="text-center space-y-4">
-              <div className={`text-6xl font-bold text-white/90 transition-transform ${isHolding ? "scale-110" : "scale-100"}`}>
+              <motion.div className="text-6xl font-bold text-white/90" animate={{ scale: isHolding ? 1.1 : 1 }}>
                 TAP
-              </div>
+              </motion.div>
               <div className="text-xl text-white/70">to assemble units</div>
               <div className="text-sm text-white/50">Hold for faster production</div>
               <div className="text-xs text-orange-400 mt-4">Manual Mode: Target 50</div>
             </div>
           </div>
-        </div>
+        </motion.div>
 
         {/* Overwork Meter */}
         {overworkMeter > 0 && (
-          <div className="mt-8 w-full max-w-md space-y-2">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mt-8 w-full max-w-md space-y-2"
+          >
             <div className="flex items-center justify-between text-sm">
               <span className="text-white/70">Overwork Level</span>
               {overworkMeter > 70 && (
-                <span className="text-red-400 font-semibold animate-pulse">
+                <motion.span
+                  className="text-red-400 font-semibold"
+                  animate={{ opacity: [1, 0.5, 1] }}
+                  transition={{ duration: 1, repeat: Number.POSITIVE_INFINITY }}
+                >
                   Slow down! You're burning out...
-                </span>
+                </motion.span>
               )}
             </div>
             <div className="w-full bg-gray-800/80 h-3 rounded-full overflow-hidden backdrop-blur-sm">
-              <div
-                className={`h-full transition-all duration-300 ${overworkMeter > 70 ? "bg-red-500" : "bg-yellow-500"}`}
-                style={{ width: `${overworkMeter}%` }}
+              <motion.div
+                className={`h-full transition-colors ${overworkMeter > 70 ? "bg-red-500" : "bg-yellow-500"}`}
+                initial={{ width: 0 }}
+                animate={{ width: `${overworkMeter}%` }}
+                transition={{ duration: 0.3 }}
               />
             </div>
-          </div>
+          </motion.div>
         )}
       </div>
     </div>
