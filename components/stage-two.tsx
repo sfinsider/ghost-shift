@@ -4,7 +4,6 @@ import type React from "react"
 
 import { useEffect, useState, useRef } from "react"
 import { useGame } from "@/contexts/game-context"
-import { motion, AnimatePresence } from "framer-motion"
 import { DecisionModal } from "./decision-modal"
 import { Button } from "./ui/button"
 
@@ -131,98 +130,72 @@ export function StageTwo() {
         <div className="relative h-full flex flex-col items-center justify-center px-4">
           {isManualMode ? (
             <>
-              <motion.div
-                className="relative w-full max-w-2xl aspect-square cursor-pointer select-none"
+              <div
+                className="relative w-full max-w-2xl aspect-square cursor-pointer select-none hover:scale-102 active:scale-98 transition-transform"
                 onMouseDown={handleHoldStart}
                 onMouseUp={handleHoldEnd}
                 onMouseLeave={handleHoldEnd}
                 onTouchStart={handleHoldStart}
                 onTouchEnd={handleHoldEnd}
                 onClick={handleTap}
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
               >
-                <AnimatePresence>
-                  {floatingTexts.map((text) => (
-                    <motion.div
-                      key={text.id}
-                      className="absolute text-4xl font-bold text-orange-400 pointer-events-none"
-                      style={{ left: text.x, top: text.y }}
-                      initial={{ opacity: 1, y: 0, scale: 1 }}
-                      animate={{ opacity: 0, y: -100, scale: 1.5 }}
-                      exit={{ opacity: 0 }}
-                      transition={{ duration: 1 }}
-                    >
-                      {text.text}
-                    </motion.div>
-                  ))}
-                </AnimatePresence>
+                {floatingTexts.map((text) => (
+                  <div
+                    key={text.id}
+                    className="absolute text-4xl font-bold text-orange-400 pointer-events-none animate-pulse"
+                    style={{ left: text.x, top: text.y, opacity: 0.8 }}
+                  >
+                    {text.text}
+                  </div>
+                ))}
 
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="text-center space-y-4">
-                    <motion.div className="text-6xl font-bold text-white/90" animate={{ scale: isHolding ? 1.1 : 1 }}>
+                    <div className={`text-6xl font-bold text-white/90 transition-transform ${isHolding ? "scale-110" : "scale-100"}`}>
                       TAP
-                    </motion.div>
+                    </div>
                     <div className="text-xl text-white/70">to assemble units</div>
                     <div className="text-sm text-white/50">Hold for faster production</div>
                     <div className="text-xs text-orange-400 mt-4">Manual Mode: Target {gameState.quotaTarget}</div>
                   </div>
                 </div>
-              </motion.div>
+              </div>
 
               {overworkMeter > 0 && (
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="mt-8 w-full max-w-md space-y-2"
-                >
+                <div className="mt-8 w-full max-w-md space-y-2">
                   <div className="flex items-center justify-between text-sm">
                     <span className="text-white/70">Overwork Level</span>
                     {overworkMeter > 70 && (
-                      <motion.span
-                        className="text-red-400 font-semibold"
-                        animate={{ opacity: [1, 0.5, 1] }}
-                        transition={{ duration: 1, repeat: Number.POSITIVE_INFINITY }}
-                      >
+                      <span className="text-red-400 font-semibold animate-pulse">
                         Slow down! You're burning out...
-                      </motion.span>
+                      </span>
                     )}
                   </div>
                   <div className="w-full bg-gray-800/80 h-3 rounded-full overflow-hidden backdrop-blur-sm">
-                    <motion.div
-                      className={`h-full transition-colors ${overworkMeter > 70 ? "bg-red-500" : "bg-yellow-500"}`}
-                      initial={{ width: 0 }}
-                      animate={{ width: `${overworkMeter}%` }}
-                      transition={{ duration: 0.3 }}
+                    <div
+                      className={`h-full transition-all duration-300 ${overworkMeter > 70 ? "bg-red-500" : "bg-yellow-500"}`}
+                      style={{ width: `${overworkMeter}%` }}
                     />
                   </div>
-                </motion.div>
+                </div>
               )}
             </>
           ) : isConveyorPhase ? (
             <div className="absolute bottom-12 left-1/2 -translate-x-1/2">
-              <motion.div
-                className="font-mono text-sm text-green-400"
-                animate={{ opacity: [0.6, 1, 0.6] }}
-                transition={{ duration: 2, repeat: Number.POSITIVE_INFINITY }}
-              >
+              <div className="font-mono text-sm text-green-400 animate-pulse">
                 CONVEYOR SYSTEMS: ONLINE [+{gameState.autoProductionRate}/sec]
-              </motion.div>
+              </div>
             </div>
           ) : (
             <div className="text-center space-y-6">
-              <motion.div
-                className="text-3xl md:text-5xl font-bold text-orange-400 px-4"
-                animate={{ opacity: [0.7, 1, 0.7] }}
-                transition={{ duration: 2, repeat: Number.POSITIVE_INFINITY }}
-              >
+              <div className="text-3xl md:text-5xl font-bold text-orange-400 px-4 animate-pulse">
                 AUTOMATED PRODUCTION
-              </motion.div>
+              </div>
               <div className="text-base md:text-xl text-white/70">+{gameState.autoProductionRate} units per second</div>
               <div className="text-xs md:text-sm text-white/50">The machines never rest</div>
 
               {gameState.isAutomated && (
-                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 2 }}>
+                <div className="mt-8">
                   <Button
                     onClick={handleSkip}
                     variant="outline"
@@ -230,7 +203,7 @@ export function StageTwo() {
                   >
                     SKIP TO COMPLETION
                   </Button>
-                </motion.div>
+                </div>
               )}
             </div>
           )}
