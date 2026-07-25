@@ -1,0 +1,28 @@
+# Ghost Shift - Project Standards
+
+## Tech Stack
+- Next.js 14 App Router
+- TypeScript
+- Tailwind CSS
+- Framer Motion
+- Lucide React
+
+## UI Guidelines
+- Use Shadcn/UI components exclusively
+- Mobile-first approach, optimized for portrait 9:16 ratio
+- Responsive design for desktop viewing
+
+## State Management
+- Use React Context for global `gameState`
+- Central State Machine manages game flow
+
+## Visual Aesthetics
+- Industrial noir theme
+- Degrading visuals: starts crisp, becomes terminal-like
+- Semi-transparent dark overlays with backdrop blur
+- Glassmorphism effects for UI panels
+
+## Code Standards
+- TypeScript strict mode
+- Component-based architecture
+- Proper type definitions for all state
