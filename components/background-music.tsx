@@ -38,7 +38,7 @@ export function BackgroundMusic({ isPlaying }: BackgroundMusicProps) {
 
   return (
     <>
-      <audio ref={audioRef} src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Industrial%20Echoes%20of%20Tomorrow-wqYw3k6BkN6neVquIZnRHwuINYLvy1.mp3" loop preload="auto" />
+     <audio ref={audioRef} src="/zene.mp3" loop preload="auto" />
 
       <button
         onClick={toggleMute}
