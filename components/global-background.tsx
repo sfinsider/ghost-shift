@@ -9,7 +9,7 @@ export function GlobalBackground() {
   const getBackgroundImage = () => {
     switch (gameState.currentStage) {
       case 0:
-        return "/images/darkfactory_01_kis.png"
+        return "/images/darkfactory-01-kis.png"
       case 1:
         return "/images/darkfactory_02_kis.png"
       case 2:
@@ -21,7 +21,7 @@ export function GlobalBackground() {
       case 5:
         return null // Endings have custom backgrounds
       default:
-        return "/images/darkfactory_01_kis.png"
+        return "/images/darkfactory-01-kis.png"
     }
   }
 
