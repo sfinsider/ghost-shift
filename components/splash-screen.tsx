@@ -24,33 +24,34 @@ export function SplashScreen({ onDismiss }: SplashScreenProps) {
   }, [onDismiss])
 
   return (
-    <style>{`
-      @keyframes fadeIn {
-        from { opacity: 0; }
-        to { opacity: 1; }
-      }
-      @keyframes blink {
-        0%, 100% { opacity: 1; }
-        50% { opacity: 0.3; }
-      }
-      .splash-container {
-        animation: fadeIn 1s ease-out forwards;
-      }
-      .splash-logo {
-        animation: fadeIn 2s ease-out forwards;
-      }
-      .splash-text {
-        animation: fadeIn 2s ease-out 0.5s forwards;
-        opacity: 0;
-      }
-      .splash-prompt {
-        animation: fadeIn 1s ease-out 1.5s forwards, blink 2s ease-in-out 2.5s infinite;
-        opacity: 0;
-      }
-    `}</style>
-    <div
-      className="splash-container fixed inset-0 z-[200] bg-black flex flex-col items-center justify-center p-8"
-    >
+    <>
+      <style>{`
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        @keyframes blink {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0.3; }
+        }
+        .splash-container {
+          animation: fadeIn 1s ease-out forwards;
+        }
+        .splash-logo {
+          animation: fadeIn 2s ease-out forwards;
+        }
+        .splash-text {
+          animation: fadeIn 2s ease-out 0.5s forwards;
+          opacity: 0;
+        }
+        .splash-prompt {
+          animation: fadeIn 1s ease-out 1.5s forwards, blink 2s ease-in-out 2.5s infinite;
+          opacity: 0;
+        }
+      `}</style>
+      <div
+        className="splash-container fixed inset-0 z-[200] bg-black flex flex-col items-center justify-center p-8"
+      >
       {/* Logo */}
       <div
         className="splash-logo mb-12"
@@ -86,5 +87,6 @@ export function SplashScreen({ onDismiss }: SplashScreenProps) {
         </p>
       </div>
     </div>
+    </>
   )
 }
