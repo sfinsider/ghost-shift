@@ -32,7 +32,7 @@ export function StageFour() {
   }
 
   return (
-    <div className="relative w-full h-screen overflow-hidden">
+    <div className="relative w-full min-h-screen overflow-y-auto">
       <div className="absolute inset-0">
         <Image
           src="/images/darkfactory_05_kis.png"
@@ -45,12 +45,12 @@ export function StageFour() {
       </div>
 
       <motion.div
-        className="relative h-full flex items-center justify-center px-4 py-8"
+        className="relative min-h-screen flex items-center justify-center px-4 py-8"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 2 }}
       >
-        <div className="max-w-3xl w-full max-h-[85vh] overflow-y-auto bg-black/80 backdrop-blur-sm p-8 md:p-12 rounded-lg border border-white/10 my-4">
+        <div className="max-w-3xl w-full bg-black/80 backdrop-blur-sm p-8 md:p-12 rounded-lg border border-white/10 my-4">
           <motion.div
             className="text-center space-y-3 mb-8 pb-6 border-b border-white/20"
             initial={{ opacity: 0 }}
@@ -79,7 +79,7 @@ export function StageFour() {
               transition={{ delay: 1 }}
             >
               <h3 className="text-lg font-bold text-orange-400 font-mono text-center">YOUR DECISION HISTORY:</h3>
-              <div className="space-y-2 max-h-[30vh] overflow-y-auto px-2">
+              <div className="space-y-2 px-2">
                 {gameState.decisionHistory.map((decision, index) => (
                   <motion.div
                     key={index}
