@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react"
 import { useGame } from "@/contexts/game-context"
-import { motion, AnimatePresence } from "framer-motion"
 import Image from "next/image"
 import { DecisionModal } from "./decision-modal"
 
@@ -234,33 +233,36 @@ export function StageThree() {
           <div className="relative w-full max-w-4xl h-48 md:h-64 bg-gray-900 overflow-hidden rounded-lg border-y-4 border-yellow-500 z-40">
             <div className="absolute inset-0 bg-[repeating-linear-gradient(90deg,rgba(255,255,255,0.02),rgba(255,255,255,0.02)_20px,transparent_20px,transparent_40px)]" />
 
-            <AnimatePresence>
-              {items.map((item) => (
-                <motion.button
-                  key={item.id}
-                  className={`absolute w-16 h-16 md:w-20 md:h-20 rounded-lg flex items-center justify-center font-bold text-white text-xs md:text-sm z-50 cursor-pointer transition-transform hover:scale-110 active:scale-95 ${
-                    item.isDefect
-                      ? "bg-red-600 border-4 border-yellow-400 shadow-[0_0_30px_rgba(239,68,68,0.8)]"
-                      : "bg-green-500 border-4 border-white shadow-[0_0_20px_rgba(34,197,94,0.6)]"
-                  }`}
-                  style={{
-                    backgroundColor: item.isDefect ? "#dc2626" : "#22c55e",
-                    top: "50%",
-                    transform: "translateY(-50%)",
-                  }}
-                  initial={{ x: -100 }}
-                  animate={{ x: typeof window !== "undefined" ? window.innerWidth + 100 : 1000 }}
-                  transition={{ duration: 5, ease: "linear" }}
-                  onAnimationComplete={() => handleItemComplete(item)}
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    handleItemClick(item)
-                  }}
-                >
-                  {item.isDefect ? "DEFECT" : "OK"}
-                </motion.button>
-              ))}
-            </AnimatePresence>
+            {items.map((item) => (
+              <button
+                key={item.id}
+                className={`absolute w-16 h-16 md:w-20 md:h-20 rounded-lg flex items-center justify-center font-bold text-white text-xs md:text-sm z-50 cursor-pointer transition-transform hover:scale-110 active:scale-95 ${
+                  item.isDefect
+                    ? "bg-red-600 border-4 border-yellow-400 shadow-[0_0_30px_rgba(239,68,68,0.8)]"
+                    : "bg-green-500 border-4 border-white shadow-[0_0_20px_rgba(34,197,94,0.6)]"
+                }`}
+                style={{
+                  backgroundColor: item.isDefect ? "#dc2626" : "#22c55e",
+                  top: "50%",
+                  left: `-100px`,
+                  animation: `slideRight 5s linear forwards`,
+                  transformOrigin: "center",
+                }}
+                onAnimationEnd={() => handleItemComplete(item)}
+                onClick={(e) => {
+                  e.stopPropagation()
+                  handleItemClick(item)
+                }}
+              >
+                {item.isDefect ? "DEFECT" : "OK"}
+              </button>
+            ))}
+            <style>{`
+              @keyframes slideRight {
+                from { left: -100px; }
+                to { left: 100%; }
+              }
+            `}</style>
           </div>
 
           <div className="text-center mt-4 md:mt-8 text-white/60 text-sm md:text-lg z-20 px-4">
@@ -273,83 +275,81 @@ export function StageThree() {
 
   if (observerMode) {
     return (
-      <div className="relative w-full h-screen overflow-hidden bg-black">
-        <div className="absolute inset-0">
-          <Image src="/images/darkfactory_04_kis.jpg" alt="AI Vision System" fill className="object-cover" priority />
-          <div className="absolute inset-0 bg-black/70" />
-        </div>
+      <>
+        <style>{`
+          @keyframes scanLine {
+            from { transform: translateY(-100%); }
+            to { transform: translateY(100%); }
+          }
+          .scan-line {
+            animation: ${scanEffect ? "scanLine 1s linear forwards" : "none"};
+          }
+        `}</style>
+        <div className="relative w-full h-screen overflow-hidden bg-black">
+          <div className="absolute inset-0">
+            <Image src="/images/darkfactory_04_kis.jpg" alt="AI Vision System" fill className="object-cover" priority />
+            <div className="absolute inset-0 bg-black/70" />
+          </div>
 
-        <AnimatePresence>
           {scanEffect && (
-            <motion.div
-              className="absolute inset-0 pointer-events-none"
-              initial={{ y: "-100%" }}
-              animate={{ y: "100%" }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 1, ease: "linear" }}
-            >
+            <div className="absolute inset-0 pointer-events-none scan-line">
               <div className="w-full h-1 bg-gradient-to-r from-transparent via-green-500 to-transparent shadow-[0_0_20px_rgba(34,197,94,0.8)]" />
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        <div className="relative h-full flex flex-col items-center justify-center px-4 pointer-events-none">
-          <div className="text-center space-y-6">
-            <motion.div
-              className="text-5xl font-bold text-green-400 font-mono"
-              animate={{ opacity: [0.7, 1, 0.7] }}
-              transition={{ duration: 2, repeat: Number.POSITIVE_INFINITY }}
-            >
-              OBSERVER MODE
-            </motion.div>
-            <div className="text-2xl text-green-500 font-mono">AI SUPERVISOR ACTIVE</div>
-            <div className="text-xl text-white/70 font-mono">SCANNING... ANALYZING... OPTIMIZING...</div>
-            <div className="text-3xl text-green-400 font-mono mt-8">
-              QUOTA: {Math.floor(gameState.quota)} / {gameState.quotaTarget}
             </div>
-            <div className="text-lg text-green-400">+{gameState.autoProductionRate} units per second</div>
-            <div className="text-sm text-white/50 font-mono mt-6">HUMAN INTERVENTION: DISABLED</div>
+          )}
+
+          <div className="relative h-full flex flex-col items-center justify-center px-4 pointer-events-none">
+            <div className="text-center space-y-6">
+              <div className="text-5xl font-bold text-green-400 font-mono animate-pulse">
+                OBSERVER MODE
+              </div>
+              <div className="text-2xl text-green-500 font-mono">AI SUPERVISOR ACTIVE</div>
+              <div className="text-xl text-white/70 font-mono">SCANNING... ANALYZING... OPTIMIZING...</div>
+              <div className="text-3xl text-green-400 font-mono mt-8">
+                QUOTA: {Math.floor(gameState.quota)} / {gameState.quotaTarget}
+              </div>
+              <div className="text-lg text-green-400">+{gameState.autoProductionRate} units per second</div>
+              <div className="text-sm text-white/50 font-mono mt-6">HUMAN INTERVENTION: DISABLED</div>
+            </div>
           </div>
         </div>
-      </div>
+      </>
     )
   }
 
   return (
-    <div className="relative w-full h-screen overflow-hidden">
-      <div className="absolute inset-0">
-        <Image src="/images/darkfactory_04_kis.jpg" alt="AI Vision System" fill className="object-cover" priority />
-        <div className="absolute inset-0 bg-black/50" />
-      </div>
+    <>
+      <style>{`
+        @keyframes scanLine {
+          from { transform: translateY(-100%); }
+          to { transform: translateY(100%); }
+        }
+        .scan-line {
+          animation: ${scanEffect ? "scanLine 1s linear forwards" : "none"};
+        }
+      `}</style>
+      <div className="relative w-full h-screen overflow-hidden">
+        <div className="absolute inset-0">
+          <Image src="/images/darkfactory_04_kis.jpg" alt="AI Vision System" fill className="object-cover" priority />
+          <div className="absolute inset-0 bg-black/50" />
+        </div>
 
-      <AnimatePresence>
         {scanEffect && (
-          <motion.div
-            className="absolute inset-0 pointer-events-none"
-            initial={{ y: "-100%" }}
-            animate={{ y: "100%" }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 1, ease: "linear" }}
-          >
+          <div className="absolute inset-0 pointer-events-none scan-line">
             <div className="w-full h-1 bg-gradient-to-r from-transparent via-green-500 to-transparent shadow-[0_0_20px_rgba(34,197,94,0.8)]" />
-          </motion.div>
+          </div>
         )}
-      </AnimatePresence>
 
-      <div className="relative h-full flex flex-col items-center justify-center px-4">
-        <div className="text-center space-y-6">
-          <motion.div
-            className="text-5xl font-bold text-green-400 font-mono"
-            animate={{ opacity: [0.7, 1, 0.7] }}
-            transition={{ duration: 2, repeat: Number.POSITIVE_INFINITY }}
-          >
-            AI VISION ACTIVE
-          </motion.div>
-          <div className="text-xl text-white/70 font-mono">SCANNING... ANALYZING... OPTIMIZING...</div>
-          <div className="text-lg text-green-400">+{gameState.autoProductionRate} units per second</div>
-          <div className="text-sm text-white/50">No human error. No mercy.</div>
+        <div className="relative h-full flex flex-col items-center justify-center px-4">
+          <div className="text-center space-y-6">
+            <div className="text-5xl font-bold text-green-400 font-mono animate-pulse">
+              AI VISION ACTIVE
+            </div>
+            <div className="text-xl text-white/70 font-mono">SCANNING... ANALYZING... OPTIMIZING...</div>
+            <div className="text-lg text-green-400">+{gameState.autoProductionRate} units per second</div>
+            <div className="text-sm text-white/50">No human error. No mercy.</div>
+          </div>
         </div>
       </div>
-    </div>
+    </>
   )
 }
