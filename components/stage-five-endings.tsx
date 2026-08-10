@@ -153,6 +153,13 @@ export function StageFiveEndings() {
           textColor: "text-red-500",
           bgClass: "bg-black/70",
         }
+      case "timeout":
+        return {
+          background: null,
+          lines: ["SHIFT TIMEOUT", "QUOTA: UNMET", "THE FACTORY DOES NOT WAIT."],
+          textColor: "text-amber-400",
+          bgClass: "bg-black",
+        }
       default:
         return {
           background: null,
