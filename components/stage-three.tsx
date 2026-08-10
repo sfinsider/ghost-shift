@@ -35,6 +35,19 @@ export function StageThree() {
   const [observerMode, setObserverMode] = useState(false)
   const [decisionShown, setDecisionShown] = useState(false)
   const failedRef = useRef(false) // Synchronous guard: true the instant the 3rd mistake lands, before React re-renders
+  const beltRef = useRef<HTMLDivElement>(null)
+  const [beltWidth, setBeltWidth] = useState(900) // Fallback until measured; matches roughly the max-w-4xl belt
+
+  useEffect(() => {
+    // Measure the actual visible belt width so items are considered "missed" the moment
+    // they exit the belt, not when they cross the entire browser window (which is much later)
+    const measureBelt = () => {
+      if (beltRef.current) setBeltWidth(beltRef.current.offsetWidth)
+    }
+    measureBelt()
+    window.addEventListener("resize", measureBelt)
+    return () => window.removeEventListener("resize", measureBelt)
+  }, [])
 
   useEffect(() => {
     console.log(
@@ -244,7 +257,10 @@ export function StageThree() {
             </div>
           </div>
 
-          <div className="relative w-full max-w-4xl h-48 md:h-64 bg-gray-900 overflow-hidden rounded-lg border-y-4 border-yellow-500 z-40">
+          <div
+            ref={beltRef}
+            className="relative w-full max-w-4xl h-48 md:h-64 bg-gray-900 overflow-hidden rounded-lg border-y-4 border-yellow-500 z-40"
+          >
             <div className="absolute inset-0 bg-[repeating-linear-gradient(90deg,rgba(255,255,255,0.02),rgba(255,255,255,0.02)_20px,transparent_20px,transparent_40px)]" />
 
             <AnimatePresence>
@@ -262,8 +278,8 @@ export function StageThree() {
                     transform: "translateY(-50%)",
                   }}
                   initial={{ x: -100 }}
-                  animate={{ x: typeof window !== "undefined" ? window.innerWidth + 100 : 1000 }}
-                  transition={{ duration: 5, ease: "linear" }}
+                  animate={{ x: beltWidth + 100 }}
+                  transition={{ duration: Math.max(2, (beltWidth + 200) / 300), ease: "linear" }}
                   onAnimationComplete={() => handleItemComplete(item)}
                   onClick={(e) => {
                     e.stopPropagation()
