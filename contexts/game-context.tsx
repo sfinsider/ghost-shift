@@ -21,6 +21,7 @@ interface GameContextType {
   setEnding: (ending: EndingType) => void
   setMinigameActive: (active: boolean) => void
   trackDecision: (stage: number, choiceLabel: string, impactLabel: string) => void
+  triggerTimeout: () => void
 }
 
 const GameContext = createContext<GameContextType | undefined>(undefined)
@@ -73,6 +74,20 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
     gameState.autoProductionRate,
     gameState.quotaTarget,
   ])
+
+  // Timeout effect - if the 5-minute shift clock hits 0 while still mid-game (stages 1-4)
+  // and no ending has been decided yet, force the round to the dedicated timeout ending.
+  useEffect(() => {
+    if (gameState.timer <= 0 && gameState.currentStage >= 1 && gameState.currentStage <= 4 && gameState.ending === null) {
+      console.log("[v0] Shift timer expired - forcing timeout ending")
+      setGameState((prev) => ({
+        ...prev,
+        ending: "timeout",
+        currentStage: 5,
+        isRunning: false,
+      }))
+    }
+  }, [gameState.timer, gameState.currentStage, gameState.ending])
 
   // Darkness level effect - increases as timer decreases
   useEffect(() => {
@@ -190,6 +205,15 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
     }))
   }, [])
 
+  const triggerTimeout = useCallback(() => {
+    setGameState((prev) => ({
+      ...prev,
+      ending: "timeout",
+      currentStage: 5,
+      isRunning: false,
+    }))
+  }, [])
+
   const contextValue = useMemo(
     () => ({
       gameState,
@@ -208,6 +232,7 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
       setEnding,
       setMinigameActive,
       trackDecision,
+      triggerTimeout,
     }),
     [
       gameState,
@@ -226,6 +251,7 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
       setEnding,
       setMinigameActive,
       trackDecision,
+      triggerTimeout,
     ],
   )
 
