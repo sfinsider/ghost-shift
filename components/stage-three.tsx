@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState, useRef } from "react"
+import { useEffect, useState, useRef, useCallback } from "react"
 import { useGame } from "@/contexts/game-context"
 import { motion, AnimatePresence } from "framer-motion"
 import Image from "next/image"
@@ -35,16 +35,22 @@ export function StageThree() {
   const [observerMode, setObserverMode] = useState(false)
   const [decisionShown, setDecisionShown] = useState(false)
   const failedRef = useRef(false) // Synchronous guard: true the instant the 3rd mistake lands, before React re-renders
-  const beltRef = useRef<HTMLDivElement>(null)
+  const beltRef = useRef<HTMLDivElement | null>(null)
   const [beltWidth, setBeltWidth] = useState(900) // Fallback until measured; matches roughly the max-w-4xl belt
 
+  // Callback ref: fires the instant the belt DOM node actually mounts (i.e. when showMinigame
+  // becomes true), unlike a useEffect(() => {}, []) which would only run at the component's
+  // very first render - long before the belt exists, while the decision modal is still showing.
+  const setBeltRef = useCallback((el: HTMLDivElement | null) => {
+    beltRef.current = el
+    if (el) setBeltWidth(el.offsetWidth)
+  }, [])
+
   useEffect(() => {
-    // Measure the actual visible belt width so items are considered "missed" the moment
-    // they exit the belt, not when they cross the entire browser window (which is much later)
+    // Keep the measurement correct if the window is resized mid-round
     const measureBelt = () => {
       if (beltRef.current) setBeltWidth(beltRef.current.offsetWidth)
     }
-    measureBelt()
     window.addEventListener("resize", measureBelt)
     return () => window.removeEventListener("resize", measureBelt)
   }, [])
@@ -258,7 +264,7 @@ export function StageThree() {
           </div>
 
           <div
-            ref={beltRef}
+            ref={setBeltRef}
             className="relative w-full max-w-4xl h-48 md:h-64 bg-gray-900 overflow-hidden rounded-lg border-y-4 border-yellow-500 z-40"
           >
             <div className="absolute inset-0 bg-[repeating-linear-gradient(90deg,rgba(255,255,255,0.02),rgba(255,255,255,0.02)_20px,transparent_20px,transparent_40px)]" />
