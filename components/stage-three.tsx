@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef } from "react"
 import { useGame } from "@/contexts/game-context"
 import { motion, AnimatePresence } from "framer-motion"
 import Image from "next/image"
@@ -34,6 +34,7 @@ export function StageThree() {
   const [systemOverride, setSystemOverride] = useState(false)
   const [observerMode, setObserverMode] = useState(false)
   const [decisionShown, setDecisionShown] = useState(false)
+  const failedRef = useRef(false) // Synchronous guard: true the instant the 3rd mistake lands, before React re-renders
 
   useEffect(() => {
     console.log(
@@ -80,7 +81,7 @@ export function StageThree() {
   }, [showMinigame, observerMode])
 
   useEffect(() => {
-   // Don't spawn items if not in minigame mode, in observer mode, or already failed
+    // Don't spawn items if not in minigame mode, in observer mode, or already failed
     if (!showMinigame || observerMode || mistakes >= 3) {
       console.log("[v0] Spawner disabled - showMinigame:", showMinigame, "observerMode:", observerMode, "mistakes:", mistakes)
       return
@@ -144,10 +145,14 @@ export function StageThree() {
   ])
 
   const handleItemComplete = (item: DefectItem) => {
-    if (systemOverride) return // Round already failed, ignore stray completions
+    if (failedRef.current) return // Round already failed, ignore stray completions (checked synchronously, no render lag)
     console.log("[v0] Item completed:", item.id, "isDefect:", item.isDefect)
     if (item.isDefect) {
-      setMistakes((m) => m + 1)
+      setMistakes((m) => {
+        const next = m + 1
+        if (next >= 3) failedRef.current = true
+        return next
+      })
       addMistake()
     } else {
       updateQuota(1)
@@ -156,13 +161,17 @@ export function StageThree() {
   }
 
   const handleItemClick = (item: DefectItem) => {
-    if (systemOverride) return // Round already failed, ignore stray clicks
+    if (failedRef.current) return // Round already failed, ignore stray clicks (checked synchronously, no render lag)
     console.log("[v0] Item clicked:", item.id, "isDefect:", item.isDefect)
     if (item.isDefect) {
       updateQuota(1)
       updateHumanityScore(1)
     } else {
-      setMistakes((m) => m + 1)
+      setMistakes((m) => {
+        const next = m + 1
+        if (next >= 3) failedRef.current = true
+        return next
+      })
       addMistake()
     }
     setItems((prev) => prev.filter((i) => i.id !== item.id))
@@ -184,6 +193,7 @@ export function StageThree() {
       // Manual QC - preserve current workers
       console.log("[v0] Decision 3: Manual QC - workers preserved")
       trackDecision(3, "Manual QC", "+5 Humanity, Workers preserved")
+      failedRef.current = false
       setShowMinigame(true)
       updateHumanityScore(5)
       // Workers unchanged (stays at current level: 100, 75, or 20)
@@ -299,8 +309,6 @@ export function StageThree() {
   }
 
   if (observerMode) {
-
- 
     return (
       <div className="relative w-full h-screen overflow-hidden bg-black">
         <div className="absolute inset-0">
