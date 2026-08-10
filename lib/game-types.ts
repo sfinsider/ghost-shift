@@ -1,6 +1,6 @@
 export type GameStage = 0 | 1 | 2 | 3 | 4 | 5
 
-export type EndingType = "automated" | "lastThree" | "sabotage" | null
+export type EndingType = "automated" | "lastThree" | "sabotage" | "timeout" | null
 
 export interface DecisionRecord {
   stage: number
